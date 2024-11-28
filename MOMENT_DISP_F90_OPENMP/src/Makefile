@@ -1,11 +1,11 @@
 ################## PARAMETERS TO MODIFY *********************************
 
-CC=gcc		#	C Compiler
+CC=cc		#	C Compiler
 CFLAGS=-O3 	# 	and its options
 #
 # GFORTRAN compiler
 #
- FC=gfortran
+ FC=ftn
  F2PY=-lgomp --opt="-Ofast -march=native" --f90flags="-fopenmp -cpp"
  FFLAGS = -Ofast -cpp -fopenmp -fPIC
 
@@ -69,8 +69,9 @@ tar:
 ######################################
 #			PYTHON
 ######################################
+fortranexec := $(shell which ftn)
 python: parameter.o dimension1.o fft2cd.o fsource.o dll2km.o axitra2py
-	f2py -c -m convmPy  -DF2PY_REPORT_ON_ARRAY_COPY=1 $(F2PY) convmPy.f90 fft2cd.o fsource.o dll2km.o
+	f2py -c -m convmPy  -DF2PY_REPORT_ON_ARRAY_COPY=1 $(F2PY) convmPy.f90 fft2cd.o fsource.o dll2km.o  --f77exec=$(fortranexec) --f90exec=$(fortranexec)
 
 axitra2py: dimension1.o dimension2.o parameter.o allocateArray.o initdata.o dll2km.o axitra2py.o 
 	$(FC) $(FFLAGS) -o $@ axitra2py.o dimension1.o dimension2.o allocateArray.o initdata.o dll2km.o parameter.o
